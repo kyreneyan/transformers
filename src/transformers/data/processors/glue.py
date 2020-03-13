@@ -523,8 +523,8 @@ class BoolqProcessor(DataProcessor):
         """See base class."""
         return InputExample(
             tensor_dict["idx"].numpy(),
-            tensor_dict["question"].numpy().decode("utf-8"),
-            tensor_dict["passage"].numpy().decode("utf-8"),
+            tensor_dict["sentence1"].numpy().decode("utf-8"),
+            tensor_dict["sentence2"].numpy().decode("utf-8"),
             str(tensor_dict["label"].numpy()),
         )
 
@@ -538,20 +538,21 @@ class BoolqProcessor(DataProcessor):
 
     def get_labels(self):
         """See base class."""
-        return ["False","True"]
+        return [False,True]
 
     def _create_examples(self, lines, set_type):
         """Creates examples for the training and dev sets."""
         examples = []
         for (i, line) in enumerate(lines):
-            if i == 0:
-                continue
-                
-            data = json.loads(line[0])
-            guid = "%s-%s" % (set_type, data["idx"])
-            text_a = data["question"]
-            text_b = data["passage"]
-            label = data["label"]
+            
+            true = True
+            false = False
+            line = eval(line[0])
+            
+            guid = "%s-%s" % (set_type, i)  
+            text_a = line["question"]
+            text_b = line["passage"]
+            label = line["label"]
             examples.append(InputExample(guid=guid, text_a=text_a, text_b=text_b, label=label))
             
         return examples
